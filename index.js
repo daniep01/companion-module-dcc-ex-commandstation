@@ -9,10 +9,12 @@ function instance(system, id, config) {
 
 	// super-constructor
 	instance_skel.apply(this, arguments);
+	
 	// export actions
 	self.actions(); 
+	
 	// presets
-	// self.init_presets();
+	self.init_presets();
 
 	return self;
 }
@@ -117,6 +119,31 @@ instance.prototype.destroy = function () {
 instance.prototype.init_presets = function () {
 	var self = this;
 	var presets = [];
+	
+		presets.push({
+			category: 'Power',
+			label: 'Main Power On & Off',
+			bank: {
+				style: 'text',
+				text: 'Main On',
+				size: '18',
+				color: 16777215,
+				bgcolor: 0,
+				latch: true
+			},
+			actions: [{
+				action: 'power',
+				options: {
+					selectedFunction: '<1 MAIN>',
+				}
+			}],
+			release_actions: [{
+				action: 'power',
+				options: {
+					selectedFunction: '<0>',
+				}
+			}],
+		});
 
 	self.setPresetDefinitions(presets);
 }
