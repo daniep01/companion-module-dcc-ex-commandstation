@@ -270,39 +270,39 @@ instance.prototype.actions = function (system) {
 instance.prototype.action = function (action) {
 	var self = this;
 	const opt = action.options;
-	self.log('info','action: ' + action.action);
+	console.log('action: ' + action.action);
 	
 	switch (action.action) {
 		
 		case 'power': {
 		
-			self.log('info','power: ' + opt.selectedFunction);
+			console.log('power: ' + opt.selectedFunction);
 			self.sendCmd(opt.selectedFunction);
 			break;		
 		}
 		case 'throttle': {
 		
-			self.log('info', 'throttle: ' + opt.dccAddress + ' ' + opt.speed + ' ' + opt.direction);
+			console.log('throttle: ' + opt.dccAddress + ' ' + opt.speed + ' ' + opt.direction);
 			self.sendCmd('<t 1 ' + opt.dccAddress + ' ' + opt.speed + ' ' + opt.direction + '>');
 			break;	
 		}	
 		case 'functions': {
 			
 			var fnCmd = opt.dccAddress + ' ' + opt.f + ' ' + Number(opt.state);
-			self.log('info','function: ' + fnCmd);
+			console.log('function: ' + fnCmd);
 			self.sendCmd('<F ' + fnCmd + '>');
 			break;	
 		}
 		case 'accessory': {
 			
 			var acCmd = opt.acAddress + ' ' + opt.acSubAddress + ' ' + Number(opt.acState);
-			self.log('info', acCmd);
+			console.log('accessory: ' + acCmd);
 			self.sendCmd('<a ' + acCmd + '>');
 			break;	
 		}		
 		case 'custom': {
 		
-			self.log('info', 'custom: ' + opt.customCommand);
+			console.log('custom: ' + opt.customCommand);
 			self.sendCmd('<' + opt.customCommand + '>');
 			break;	
 		}		
