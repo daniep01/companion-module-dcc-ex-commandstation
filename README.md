@@ -17,7 +17,7 @@ This is my setup, other combinations of hardware will work
 * Code from this repo in the Companion module-local-dev directory
   * Download all files in this repository and place in `companion/module-local-dev/companion-module-dcc++ex-commandstation`
 * An instance of the DCC++EX module running in Companion
-  * Enter the IP address of the Arduino running CommandStation
+  * Enter the IP address of the Arduino running CommandStation [Example](/images/instance.png)
 * StreamDeck connected to RaspberryPi USB port
 * Desktop or laptop to view Companion web interface for setup
   * Using a web browser connect to the IP address of the RaspberryPi on port 8000
