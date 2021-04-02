@@ -1,6 +1,6 @@
 # companion-module-dcc-ex-commandstation
 
-A bitfocus companion module for model railway control using DCC 
+A bitfocus companion module for model railway control using DCC.
 
 This code will allow you to control a [DCC++EX commandstation](https://dcc-ex.com/index.html) from [StreamDeck controllers](https://www.elgato.com/en/stream-deck) by making use of [Bitfocus Companion](https://bitfocus.io). This combination makes it very easy to make a dynamic and fully customisable push-button DCC controller. It is similar in concept to web/app throttles but uses a relatively cheap hardware interface. Any button can send one or more commands to the CommandStation-EX. Buttons can be arranged in multiple pages, allowing for example one page for each loco. Some [Example pages](EXAMPLES.md).
 
