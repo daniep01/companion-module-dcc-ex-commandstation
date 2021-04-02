@@ -7,18 +7,19 @@ This code will allow you to control a [DCC++EX CommandStation-EX](https://dcc-ex
 ![](/images/IMG_4662.jpeg)
 
 ## Requirements
-This is my setup, other combinations of hardware will work
+This is my setup, other combinations of hardware will work. Companion will also run on Mac and Windows.
 
-* CommandStationEX running on Arduino Mega with motor shield and WiFi
+* CommandStation-EX running on Arduino Mega with motor shield and WiFi
   * [Follow these instuctions](https://dcc-ex.com/get-started/index.html)
+* Track power and external PSU wired to motor shield
 * RaspberryPi running Companion installed from source
   * [Follow these instuctions](https://github.com/bitfocus/companion/wiki/Manual-Install-on-Raspberry-Pi)
 * Network connection between CommandStationEX and RaspberryPi (both on same LAN)
 * Code from this repo in the Companion module-local-dev directory
   * Download all files in this repository and place in `companion/module-local-dev/companion-module-dcc++ex-commandstation`
 * An instance of the DCC++EX module running in Companion
-  * Enter the IP address of the Arduino running CommandStation [Example](/images/instance.png)
-* StreamDeck connected to RaspberryPi USB port
+  * Enter the IP address of the Arduino running CommandStation ([Example](/images/instance.png))
+* StreamDeck controller connected to RaspberryPi USB port
 * Desktop or laptop to view Companion web interface for setup
   * Using a web browser connect to the IP address of the RaspberryPi on port 8000
 * JMRI for programming of DCC decoders
