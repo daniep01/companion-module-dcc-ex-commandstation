@@ -3,6 +3,8 @@ A bitfocus companion module for model railway control using DCC
 
 This module will allow you to control a [DCC++EX commandstation](https://dcc-ex.com/index.html) from [StreamDeck controllers](https://www.elgato.com/en/stream-deck) by using [Bitfocus Companion](https://bitfocus.io).
 
+![](/images/IMG_4661.jpeg)
+
 ## Requirements
 This is my setup, other combinations of hardware will work
 
