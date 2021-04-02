@@ -1,8 +1,5 @@
 var instance_skel = require('../../instance_skel');
 var tcp           = require('../../tcp');
-var udp           = require('../../udp');
-
-// var feedback      = require('./feedback');
 
 var debug;
 var log;
@@ -30,7 +27,6 @@ instance.prototype.updateConfig = function (config) {
 	}
 
 	self.config = config;
-
 	self.init_tcp();
 	
 };
@@ -40,8 +36,8 @@ instance.prototype.init = function () {
 
 	debug = self.debug;
 	log = self.log;
+	
 	self.init_presets();
-
 	self.init_tcp();
 
 };
@@ -78,8 +74,6 @@ instance.prototype.init_tcp = function() {
 	}
 };
 
-
-
 // Return config fields for web config
 instance.prototype.config_fields = function () {
 	var self = this;
@@ -97,7 +91,8 @@ instance.prototype.config_fields = function () {
 			label: 'Device IP',
 			width: 6,
 			regex: self.REGEX_IP
-		},{
+		},
+		{
 			type: 'textinput',
 			id: 'port',
 			label: 'Control port',
@@ -311,30 +306,16 @@ instance.prototype.sendCmd = function(cmdStr) {
 	console.log(sendBuf);
 
 	if (sendBuf != '') {
+		// self.log('info','sending ',sendBuf,"to",self.config.host);
 
-		if (self.config.prot == 'tcp') {
-
-			// self.log('info','sending ',sendBuf,"to",self.config.host);
-
-			if (self.socket !== undefined && self.socket.connected) {
-				self.socket.send(sendBuf);
-			}
-			else {
-				self.log('error','Socket not connected :(');
-			}
+		if (self.socket !== undefined && self.socket.connected) {
+			self.socket.send(sendBuf);
 		}
-
-		if (self.config.prot == 'udp') {
-
-			if (self.udp !== undefined ) {
-				// self.log('info','sending',sendBuf,"to",self.config.host);
-
-				self.udp.send(sendBuf);
-			}
+		else {
+			self.log('error','Socket not connected :(');
 		}
 	}
 }
-
 
 instance_skel.extendedBy(instance);
 exports = module.exports = instance;
