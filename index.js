@@ -159,6 +159,7 @@ instance.prototype.actions = function (system) {
 					type: 'dropdown',
 					label: 'function',
 					id: 'selectedFunction',
+					default: '<0>',
 					choices: [
 					{ id: '<1 MAIN>', label: 'On Main'}, 
 					{ id: '<1 PROG>', label: 'On Prog'},
