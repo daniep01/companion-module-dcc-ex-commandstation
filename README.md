@@ -16,7 +16,7 @@ This is my setup, other combinations of hardware will work. Companion will also 
   * [Follow these instuctions](https://github.com/bitfocus/companion/wiki/Manual-Install-on-Raspberry-Pi)
 * Network connection between CommandStationEX and RaspberryPi (both on same LAN)
 * Code from this repo in the Companion module-local-dev directory
-  * Download all files in this repository and place in `companion/module-local-dev/companion-module-dcc++ex-commandstation`
+  * Download all files in this repository and place in `companion/module-local-dev/companion-module-dcc-ex-commandstation`
 * An instance of the DCC++EX module running in Companion
   * Enter the IP address of the Arduino running CommandStation ([Example](/images/instance.png))
 * StreamDeck controller connected to RaspberryPi USB port
