@@ -21,16 +21,19 @@ function instance(system, id, config) {
 
 instance.prototype.updateConfig = function (config) {
 	var self = this;
-	self.init_presets();
 
 	if (self.socket !== undefined) {
 		self.socket.destroy();
 		delete self.socket;
 	}
 
+	self.init_presets();
+	
+	self.setVariable('Version',null)
+	self.setVariable('Power',null)
+	
 	self.config = config;
 	self.init_tcp();
-	
 };
 
 instance.prototype.init = function () {
@@ -38,10 +41,25 @@ instance.prototype.init = function () {
 
 	debug = self.debug;
 	log = self.log;
-	
+
+	self.setVariableDefinitions( [
+		{
+			label: 'Command Station',
+			name: 'Version',
+		},
+		{
+			label: 'Track Power',
+			name: 'Power',
+		}
+	])
+
 	self.init_presets();
 	self.init_tcp();
-
+	
+	if (self.socket !== undefined && self.socket.connected) {
+		self.sendCmd('<s>')
+	}
+	
 };
 
 instance.prototype.init_tcp = function() {
@@ -107,11 +125,14 @@ instance.prototype.init_tcp = function() {
 					}
 					case 'p': {
 						// power status
+						self.setVariable('Power',line.trim());
 						break;
 					}
 					case 'i': {
 						// command station info
-						self.log('info',line.substr(1).trim())
+						self.log('info',line.substr(1).trim());
+						var infoArr = line.substr(1).split('/')
+						self.setVariable('Version',infoArr[0].trim());
 						break;
 					}
 					case 'Q': {
@@ -156,7 +177,7 @@ instance.prototype.config_fields = function () {
 			id: 'info',
 			width: 12,
 			label: 'Information',
-			value: 'This module is for DCC++EX Command Station version 3'
+			value: 'This module is for DCC++EX Command Station (Version 3)'
 		},
 		{
 			type: 'textinput',
@@ -190,8 +211,6 @@ instance.prototype.destroy = function () {
 	if (self.socket !== undefined) {
 		self.socket.destroy();
 	}
-
-	debug("destroy", self.id);;
 };
 
 instance.prototype.init_presets = function () {
@@ -407,7 +426,6 @@ instance.prototype.action = function (action) {
 		default:
 			break;
 	}
-
 };
 
 instance.prototype.sendCmd = function(cmdStr) {
