@@ -1,22 +1,26 @@
 var instance_skel = require('../../instance_skel');
+var presets       = require('./presets.js')
 var tcp           = require('../../tcp');
 
 var debug;
 var log;
 
 function instance(system, id, config) {
-	var self = this;
+	var self = this
+	
+	self.powerOptions = [
+		{ id: '1 MAIN', label: 'On Main'}, 
+		{ id: '1 PROG', label: 'On Prog'},
+		{ id: '1 JOIN', label: 'On Join'},
+		{ id: '1', label: 'On Both'},
+		{ id: '!', label: 'All Stop'},
+		{ id: '0', label: 'Off'},
+		]
 
 	// super-constructor
-	instance_skel.apply(this, arguments);
-	
-	// export actions
-	self.actions(); 
-	
-	// presets
-	self.init_presets();
+	instance_skel.apply(this, arguments)
 
-	return self;
+	return self
 }
 
 instance.prototype.updateConfig = function (config) {
@@ -27,13 +31,12 @@ instance.prototype.updateConfig = function (config) {
 		delete self.socket;
 	}
 
-	self.init_presets();
-	
 	self.setVariable('Version',null)
 	self.setVariable('Power',null)
 	
-	self.config = config;
-	self.init_tcp();
+	self.config = config
+	self.init_tcp()
+	self.actions()
 };
 
 instance.prototype.init = function () {
@@ -44,23 +47,64 @@ instance.prototype.init = function () {
 
 	self.setVariableDefinitions( [
 		{
-			label: 'Command Station',
+			label: 'Command Station Version',
 			name: 'Version',
 		},
 		{
-			label: 'Track Power',
+			label: 'Track Power State',
 			name: 'Power',
 		}
 	])
 
-	self.init_presets();
-	self.init_tcp();
+	// setup
+	self.actions()
+	self.init_presets()
+	self.init_feedbacks()
+	self.init_tcp()
+
+};
+
+instance.prototype.init_presets = function () {
+	var self = this
+	self.setPresetDefinitions(presets.get_presets(self.label))
+}
+
+instance.prototype.init_feedbacks = function (system) {
+	var self = this
 	
-	if (self.socket !== undefined && self.socket.connected) {
-		self.sendCmd('<s>')
+	var feedbacks = {}
+	
+	feedbacks['powerFeedback'] = {
+		label: 'Track Power Status',
+		description: 'Change background colour on track power state',
+		options: [
+			{
+				type: 'colorpicker',
+				label: 'Foreground colour',
+				id: 'fg',
+				default: self.rgb(255, 255, 255),
+			},
+			{
+				type: 'colorpicker',
+				label: 'Background colour',
+				id: 'bg',
+				default: self.rgb(102, 153, 0),
+			},
+			{
+				type: 'dropdown',
+				label: 'Power State',
+				id: 'powerState',
+				default: '1',
+				choices: [
+					{ id: '1', label: 'Power On' },
+					{ id: '0', label: 'Power Off' }, 
+				]
+			},
+		],
 	}
 	
-};
+	self.setFeedbackDefinitions(feedbacks)
+}
 
 instance.prototype.init_tcp = function() {
 	var self = this;
@@ -73,22 +117,27 @@ instance.prototype.init_tcp = function() {
 
 	self.status(self.STATE_WARNING, 'Connecting');
 
+	var options = { reconnect_interval: 5000 }
+
 	if (self.config.host) {
-		self.socket = new tcp(self.config.host, self.config.port);
+		self.socket = new tcp(self.config.host, self.config.port, options);
 
 		self.socket.on('status_change', function (status, message) {
+			console.log(message)
 			self.status(status, message);
 		});
 
 		self.socket.on('error', function (err) {
-			debug("Network error", err);
+			console.log('Network error', err);
 			self.status(self.STATE_ERROR, err);
-			self.log('error',"Network error: " + err.message);
+			self.log('error','Network error: ' + err.message);
 		});
 
 		self.socket.on('connect', function () {
 			self.status(self.STATE_OK);
-			debug("Connected");
+			console.log('Connected');
+			
+			self.sendCmd('<s>')
 		})
 
 		self.socket.on('data', function (chunk) {
@@ -102,9 +151,8 @@ instance.prototype.init_tcp = function() {
 				line = receivebuffer.substr(offset, i - offset)
 				offset = i + 1
 				console.log(line.toString())
-				line = line.replace('<','');
-				line = line.replace('>','');
-				console.log(line);
+				line = line.replace('<','')
+				line = line.replace('>','')
 				if (self.config.debuglog === true) {
 					self.log('debug','Received: ' + line)
 				}
@@ -125,15 +173,18 @@ instance.prototype.init_tcp = function() {
 					}
 					case 'p': {
 						// power status
-						self.setVariable('Power',line.trim());
+						self.setVariable('Power',line.substr(1).trim())
+						// take only first char (0 or 1)
+						self.powerState = line.substr(1,1).trim()
+						self.checkFeedbacks('powerFeedback')
 						break;
 					}
 					case 'i': {
 						// command station info
-						self.log('info',line.substr(1).trim());
+						self.log('info',line.substr(1).trim())
 						var infoArr = line.substr(1).split('/')
-						self.setVariable('Version',infoArr[0].trim());
-						break;
+						self.setVariable('Version',infoArr[0].trim())
+						break
 					}
 					case 'Q': {
 						// sensors
@@ -213,36 +264,23 @@ instance.prototype.destroy = function () {
 	}
 };
 
-instance.prototype.init_presets = function () {
-	var self = this;
-	var presets = [];
+instance.prototype.feedback = function (event, bank) {
+	var self = this
 	
-		presets.push({
-			category: 'Power',
-			label: 'Main Power On & Off',
-			bank: {
-				style: 'text',
-				text: 'Main On',
-				size: '18',
-				color: 16777215,
-				bgcolor: 0,
-				latch: true
-			},
-			actions: [{
-				action: 'power',
-				options: {
-					selectedFunction: '<1 MAIN>',
+	console.log('checking feedback: ' + event.type)
+	
+	switch (event.type) {
+		case 'powerFeedback': {
+			console.log(self.powerState + ' ' + event.options.powerState)
+			if (self.powerState === event.options.powerState) {
+				return {
+					color: event.options.fg,
+					bgcolor: event.options.bg,
 				}
-			}],
-			release_actions: [{
-				action: 'power',
-				options: {
-					selectedFunction: '<0>',
-				}
-			}],
-		});
-
-	self.setPresetDefinitions(presets);
+			}
+			break
+		}
+	}
 }
 
 instance.prototype.actions = function (system) {
@@ -254,19 +292,12 @@ instance.prototype.actions = function (system) {
 			options: [
 				{
 					type: 'dropdown',
-					label: 'function',
+					label: 'Function',
 					id: 'selectedFunction',
-					default: '<0>',
-					choices: [
-					{ id: '<1 MAIN>', label: 'On Main'}, 
-					{ id: '<1 PROG>', label: 'On Prog'},
-					{ id: '<1 JOIN>', label: 'On Join'},
-					{ id: '<1>', label: 'On Both'},
-					{ id: '<!>', label: 'All Stop'},
-					{ id: '<0>', label: 'Off'}
-					]
-				}
-			]
+					default: '0',
+					choices: self.powerOptions,
+				},
+			],
 		},
 		'throttle': {
 			label: 'Throttle',
@@ -393,7 +424,7 @@ instance.prototype.action = function (action) {
 		
 		case 'power': {
 			console.log('power: ' + opt.selectedFunction);
-			self.sendCmd(opt.selectedFunction);
+			self.sendCmd('<' + opt.selectedFunction + '>');
 			break;		
 		}
 		case 'throttle': {
@@ -449,7 +480,7 @@ instance.prototype.sendCmd = function(cmdStr) {
 	console.log(sendBuf);
 
 	if (sendBuf != '') {
-		// self.log('info','sending ',sendBuf,"to",self.config.host);
+		// self.log('info','sending ',sendBuf,'to',self.config.host);
 
 		if (self.socket !== undefined && self.socket.connected) {
 			self.socket.send(sendBuf);
