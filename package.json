@@ -1,0 +1,21 @@
+{
+	"name": "dcc-ex-commandstation",
+	"version": "1.0.0",
+	"api_version": "3.0.10",
+	"keywords": [
+		"Model Railway",
+		"DCC"
+	],
+	"manufacturer": "DCC++EX",
+	"product": [
+		"Command Station"
+	],
+	"shortname": "DCC_EX",
+	"description": "Companion module for DCC++EX Command Station",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Peter Daniel",
+	"license": "MIT"
+}
