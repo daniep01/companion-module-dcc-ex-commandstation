@@ -44,5 +44,5 @@ For each loco a range of speeds are available along with lighting control. This 
 ### Comments and Issue
 Please [open an issue](https://github.com/bitfocus/companion-module-dcc-ex-commandstation/issues) if you have any problems or suggestions.
 
-### Updates
+### Updates
 As the code for this module is now bundled with Companion it is held in a different Repo, [please head here if you wish to access the code](https://github.com/bitfocus/companion-module-dcc-ex-commandstation).
